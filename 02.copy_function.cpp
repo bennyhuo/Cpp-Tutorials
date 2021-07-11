@@ -3,6 +3,25 @@
 
 using namespace std;
 
+class Callback {
+ public:
+  virtual void OnSuccess() = 0;
+
+  virtual void OnError() = 0;
+};
+
+class CallbackImpl: Callback {
+ public:
+  void OnSuccess() override {
+    cout << "success" << endl;
+  }
+  void OnError() override {
+    cout << "error" << endl;
+  }
+};
+
+
+
 class Person {
  public:
   string name;
@@ -61,5 +80,8 @@ int main() {
 
   Person person3("bennyhuo;30");
   // person3 = "bennyhuo;40";
+
+  auto callback = CallbackImpl();
+  callback.OnSuccess();
   return 0;
 }
