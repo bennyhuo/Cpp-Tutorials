@@ -30,13 +30,6 @@ class Person {
   Person(char const *name, int age) : name(name), age(age) {}
 
   Person(Person &other) {
-    cout << "copy" << endl;
-    this->name = other.name;
-    this->age = 0;
-  }
-
-  Person(Person const &other) {
-    cout << "move" << endl;
     this->name = other.name;
     this->age = 0;
   }
