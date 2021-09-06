@@ -5,12 +5,9 @@ using namespace std;
 
 template<typename ... U>
 void Println(U... u) {
-  // u0 u1 u2 u3
-  // Println(u0, Println(u1, Println(u2, Println(u3))));
-  // cout << u0 << ", ", cout << u1 << ", ", ....
-  size_t index = 0;
-  auto printer = [index]<typename Arg>(Arg arg) mutable {
-    if (sizeof...(U) == ++index) cout << arg << endl;
+  int i = 0;
+  auto printer = [&i]<typename Arg>(Arg arg) {
+    if (sizeof...(U) == ++i) cout << arg << endl;
     else cout << arg << ", ";
   };
   (printer(u), ...);
