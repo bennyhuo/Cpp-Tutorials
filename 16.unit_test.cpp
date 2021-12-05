@@ -1,6 +1,8 @@
+#define CATCH_CONFIG_MAIN
 #include <iostream>
 #include <string>
 #include <vector>
+#include <catch2/catch.hpp>
 
 using std::cout;
 using std::endl;
@@ -14,7 +16,6 @@ class Buffer {
  public:
   explicit Buffer(int capacity) : capacity(capacity), length(0) {
     buf = capacity == 0 ? nullptr : new unsigned char[capacity]{};
-    cout << "Constructor: " << *this << std::endl;
   }
 
   friend void swap(Buffer &lhs, Buffer &rhs) noexcept {
@@ -29,6 +30,7 @@ class Buffer {
       capacity(buffer.capacity),
       length(buffer.length),
       buf(buffer.capacity ? new unsigned char[buffer.capacity]{} : nullptr) {
+    std::copy(buffer.buf, buffer.buf + buffer.capacity, buf);
   }
 
   Buffer &operator=(Buffer buffer) {
@@ -57,6 +59,12 @@ class Buffer {
     return true;
   }
 
+  bool operator==(Buffer const &other) const {
+    return capacity == other.capacity &&
+        length == other.length &&
+        std::memcmp(buf, other.buf, length) == 0;
+  }
+
   ~Buffer() {
     delete[] buf;
   }
@@ -77,7 +85,7 @@ class Bitmap {
  public:
   Buffer buffer;
 
-  explicit Bitmap(int size): buffer(size) { }
+  explicit Bitmap(int size) : buffer(size) {}
 
   friend void swap(Bitmap &lhs, Bitmap &rhs) {
     using std::swap;
@@ -86,16 +94,27 @@ class Bitmap {
 
 };
 
-int main() {
-  Buffer buffer1(16);
-  buffer1.write(1);
-  buffer1.write(2);
-  Buffer buffer2 = buffer1;
+TEST_CASE("Buffer", "[Buffer]") {
+  SECTION("Basic") {
+    Buffer buffer(16);
+    REQUIRE(buffer.GetLength() == 0);
+    REQUIRE(buffer.GetCapacity() == 16);
+    buffer.write(1);
+    buffer.write(2);
+    REQUIRE(buffer.GetLength() == 2);
+    REQUIRE(buffer.GetCapacity() == 16);
+  }
 
-  cout << buffer1 << endl;
-  cout << buffer2 << endl;
-  cout << buffer2.GetLength() << endl;
+  SECTION("Copy Constructor") {
+    Buffer buffer1(16);
+    buffer1.write(1);
+    buffer1.write(2);
+    Buffer buffer2 = buffer1;
+    REQUIRE(buffer2 == buffer1);
+  }
+}
 
-
-  return 0;
+TEST_CASE("Bitmap", "[Bitmap]") {
+  Bitmap bitmap(5);
+  REQUIRE(bitmap.buffer.GetCapacity() == 5);
 }
